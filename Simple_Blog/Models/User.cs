@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
 namespace Simple_Blog.Models {
-    public class Users {
+    public class User {
         public int Id { get; set; }
 
         [Required]

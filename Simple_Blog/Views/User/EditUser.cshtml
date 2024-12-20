@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Create Account";
+    ViewData["Title"] = "Edit User";
 }
 
 @model Simple_Blog.Models.User
@@ -9,10 +9,12 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h3 class="text-center">Create Account</h3>
+                    <h3 class="text-center">Edit User</h3>
                 </div>
                 <div class="card-body">
-                    <form asp-controller="User" asp-action="RegisterUser" method="post">
+                    <form asp-controller="User" asp-action="SaveEdit" method="post">
+                        <input type="hidden" asp-for="Id"/>
+
                         <div class="mb-3">
                             <label class="form-label">Username</label>
                             <input asp-for="Username" class="form-control" />
@@ -24,20 +26,17 @@
                             <input asp-for="Email" class="form-control" type="email" />
                             <span asp-validation-for="Email" class="text-danger"></span>
                         </div>
-
+                        
                         <div class="mb-3">
                             <label class="form-label">Password</label>
-                            <input asp-for="Password" class="form-control" type="password" />
+                            <input asp-for="Password" class="form-control"/>
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
 
                         <div class="d-grid">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                            <button type="submit" class="btn btn-primary">Submit</button>
                         </div>
                     </form>
-                </div>
-                <div class="card-footer text-center">
-                    Already have an account? <a asp-controller="User" asp-action="Login">Login here</a>
                 </div>
             </div>
         </div>
