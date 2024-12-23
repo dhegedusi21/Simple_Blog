@@ -21,14 +21,43 @@ namespace Simple_Blog.Controllers {
         public IActionResult Login() {
             return View();
         }
+
+        public IActionResult LoginUser(User user) {
+            var userInDb = _context.Users.FirstOrDefault(u =>
+                u.Email == user.Email &&
+                u.Password == user.Password);
+
+            if (userInDb == null) {
+                ViewBag.Error = "Invalid email or password";
+                return View("Login");
+            }
+
+            HttpContext.Session.SetString("UserId", userInDb.Id.ToString());
+            HttpContext.Session.SetString("UserEmail", userInDb.Email);
+
+            return RedirectToAction("Index", "Home");
+        }
+
+        public IActionResult Logout() {
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+
         public IActionResult Register() {
             return View();
         }
         public IActionResult RegisterUser(User user) {
 
+            if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password)) {
+                ViewBag.Error = "All fields are required!";
+                return View("Register");
+            }
+
             _context.Users.Add(user);
             _context.SaveChanges();
 
+            TempData["Success"] = "Registration successful! Please log in.";
             return RedirectToAction("Login");
         }
 
