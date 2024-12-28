@@ -1,8 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Simple_Blog.Models;
 using System.Diagnostics;
 
 namespace Simple_Blog.Controllers {
+    [Authorize]
+
     public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
 

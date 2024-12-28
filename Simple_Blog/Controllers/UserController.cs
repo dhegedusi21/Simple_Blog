@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
 using Simple_Blog.Data;
 using Simple_Blog.Models;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace Simple_Blog.Controllers {
     public class UserController : Controller {
@@ -22,26 +25,36 @@ namespace Simple_Blog.Controllers {
             return View();
         }
 
-        public IActionResult LoginUser(User user) {
+        public async Task<IActionResult> LoginUser(User user) {
             var userInDb = _context.Users.FirstOrDefault(u =>
-                u.Email == user.Email &&
-                u.Password == user.Password);
+            u.Email == user.Email &&
+            u.Password == user.Password);
 
             if (userInDb == null) {
                 ViewBag.Error = "Invalid email or password";
                 return View("Login");
             }
 
-            HttpContext.Session.SetString("UserId", userInDb.Id.ToString());
-            HttpContext.Session.SetString("UserEmail", userInDb.Email);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, userInDb.Username),
+                new Claim(ClaimTypes.NameIdentifier, userInDb.Id.ToString())
+            };
+
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Logout() {
-            HttpContext.Session.Clear();
+        public async Task<IActionResult> Logout() {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login");
         }
+
 
 
         public IActionResult Register() {

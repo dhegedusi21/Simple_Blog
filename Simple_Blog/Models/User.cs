@@ -8,9 +8,11 @@ namespace Simple_Blog.Models {
         [StringLength(255)]
         public string Username { get; set; }
 
+
         [Required]
         [StringLength(255)]
         public string Email { get; set; }
+
 
         [Required]
         [StringLength(255)]
