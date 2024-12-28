@@ -1,4 +1,5 @@
-﻿@{
+﻿@using System.Security.Claims
+@{
     ViewData["Title"] = "Blog";
 }
 @model List<Blog_post>
@@ -12,7 +13,9 @@
             <a asp-action="Create" class="btn btn-primary">Create New Post</a>
         </div>
     </div>
-
+    @{
+        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+    }
     @foreach (var post in Model)
     {
         <div class="card mb-4">
@@ -20,9 +23,26 @@
                 <h3>@post.Title</h3>
                 <p class="text-muted">By @post.User.Username on @post.CreatedAt.ToShortDateString()</p>
                 <p>@post.Content</p>
-                <div>
-                    <a asp-action="Edit" asp-route-id="@post.Id" class="btn btn-warning">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@post.Id" class="btn btn-danger">Delete</a>
+
+                <form asp-controller="Blog" asp-action="AddComment" method="post">
+                    <input type="hidden" name="blogpostId" value="@post.Id" />
+                    <div class="mb-3">
+                        <textarea name="content" class="form-control" rows="2" placeholder="Write a comment..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Comment</button>
+                </form>
+
+                <div class="mt-4">
+                    <h5>Comments</h5>
+                    @foreach (var comment in _context.Comments.Where(c => c.Blogpost_Id == post.Id).Include(c => c.User))
+                    {
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <p class="mb-1">@comment.Content</p>
+                                <small class="text-muted">By @comment.User.Username on @comment.CreatedAt.ToShortDateString()</small>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
         </div>

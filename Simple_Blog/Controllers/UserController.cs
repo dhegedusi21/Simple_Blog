@@ -47,7 +47,7 @@ namespace Simple_Blog.Controllers {
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Blog");
         }
 
         public async Task<IActionResult> Logout() {
