@@ -8,6 +8,7 @@ using System.Security.Claims;
 
 namespace Simple_Blog.Controllers {
     public class UserController : Controller {
+
         private readonly ILogger<UserController> _logger;
         private readonly BlogDbContext _context;
 
@@ -18,6 +19,7 @@ namespace Simple_Blog.Controllers {
 
         public IActionResult UserOverview() {
             var allUsers = _context.Users.ToList();
+
             return View(allUsers);
         }
 
@@ -25,10 +27,12 @@ namespace Simple_Blog.Controllers {
             return View();
         }
 
+
+        [HttpPost]
         public async Task<IActionResult> LoginUser(User user) {
             var userInDb = _context.Users.FirstOrDefault(u =>
-            u.Email == user.Email &&
-            u.Password == user.Password);
+                                        u.Email == user.Email &&
+                                        u.Password == user.Password);
 
             if (userInDb == null) {
                 ViewBag.Error = "Invalid email or password";
@@ -52,6 +56,7 @@ namespace Simple_Blog.Controllers {
 
         public async Task<IActionResult> Logout() {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             return RedirectToAction("Login");
         }
 
@@ -60,8 +65,9 @@ namespace Simple_Blog.Controllers {
         public IActionResult Register() {
             return View();
         }
-        public IActionResult RegisterUser(User user) {
 
+        [HttpPost]
+        public IActionResult RegisterUser(User user) {
             if (string.IsNullOrEmpty(user.Username) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password)) {
                 ViewBag.Error = "All fields are required!";
                 return View("Register");
@@ -75,8 +81,8 @@ namespace Simple_Blog.Controllers {
         }
 
         public IActionResult Delete(int id) {
+        var userInDb = _context.Users.SingleOrDefault(x => x.Id == id);
 
-            var userInDb = _context.Users.SingleOrDefault(x => x.Id == id);
             _context.Users.Remove(userInDb);
             _context.SaveChanges();
 
@@ -85,10 +91,11 @@ namespace Simple_Blog.Controllers {
 
         public IActionResult EditUser (int id) {
             var userInDb = _context.Users.SingleOrDefault(x => x.Id == id);
-            return View(userInDb);
 
+            return View(userInDb);
         }
 
+        [HttpPost]
         public IActionResult SaveEdit(User user) {
             _context.Users.Update(user);
             _context.SaveChanges();

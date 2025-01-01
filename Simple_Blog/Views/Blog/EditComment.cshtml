@@ -1,35 +1,32 @@
-﻿@{
-    ViewData["Title"] = "Edit post";
+﻿@using System.Security.Claims
+@{
+    ViewData["Title"] = "Edit Comment";
 }
-@model Blog_post
+@model Comment
 
 <div class="container mt-4">
     <div class="card">
 
         <div class="card-header">
-            <h3>Edit Blog Post</h3>
+            <h3>Edit Comment</h3>
         </div>
 
         <div class="card-body">
 
-            <form asp-action="EditPost" method="post">
+            <form asp-action="EditCommentSave" method="post">
 
                 <input type="hidden" asp-for="Id" />
                 <input type="hidden" asp-for="User_Id" />
+                <input type="hidden" asp-for="Blogpost_Id" />
                 <input type="hidden" asp-for="CreatedAt" />
 
                 <div class="mb-3">
-                    <label asp-for="Title" class="form-label">Title</label>
-                    <input asp-for="Title" class="form-control" />
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="Content" class="form-label">Content</label>
-                    <textarea asp-for="Content" class="form-control" rows="10"></textarea>
+                    <textarea asp-for="Content" class="form-control" rows="3"></textarea>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save Changes</button>
-                <a asp-action="Index" class="btn btn-secondary">Back</a>
+                <a asp-action="Index" class="btn btn-secondary">Back to All Posts</a>
 
             </form>
         </div>

@@ -6,43 +6,108 @@
 
 <div class="container mt-4">
     <div class="row mb-4">
+
+        <div class="col d-flex align-items-center">
+            <h2 class="mb-0">Blog Posts</h2>
+            <a asp-action="Create" class="btn btn-primary ms-3">Create New Post</a>
+        </div>
+
         <div class="col">
-            <h2>Blog Posts</h2>
+            <form asp-action="Index" method="get" class="d-flex">
+                <input type="text" name="searchString" class="form-control me-2" placeholder="Search posts..." />
+                <button type="submit" class="btn btn-outline-primary">Search</button>
+            </form>
         </div>
-        <div class="col text-end">
-            <a asp-action="Create" class="btn btn-primary">Create New Post</a>
-        </div>
+
     </div>
+</div>
+
     @{
-        var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        var currentUserId = 0;
+        if (User.Identity.IsAuthenticated)
+        {
+            currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+        }
     }
+
     @foreach (var post in Model)
     {
         <div class="card mb-4">
             <div class="card-body">
-                <h3>@post.Title</h3>
-                <p class="text-muted">By @post.User.Username on @post.CreatedAt.ToShortDateString()</p>
-                <p>@post.Content</p>
+                <div class="d-flex justify-content-between align-items-start bg-dark p-3 rounded">
 
-                <form asp-controller="Blog" asp-action="AddComment" method="post">
-                    <input type="hidden" name="blogpostId" value="@post.Id" />
-                    <div class="mb-3">
-                        <textarea name="content" class="form-control" rows="2" placeholder="Write a comment..."></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Comment</button>
-                </form>
+                    <h3 class="mb-0">@post.Title</h3>
+
+                    @if (post.User_Id == currentUserId)
+                    {
+                        <div class="border rounded px-2 py-1">
+
+                            <a asp-action="Edit" asp-route-id="@post.Id" class="text-muted text-decoration-none">Edit</a>
+                            <span class="mx-1">|</span>
+                            <a asp-action="Delete" asp-route-id="@post.Id" class="text-muted text-decoration-none">Delete</a>
+
+                        </div>
+                    }
+                </div>
+
+                <p class="text-muted mt-2">
+                    By @post.User.Username on @post.CreatedAt.ToShortDateString()
+
+                    @if ((post.UpdatedAt - post.CreatedAt).TotalSeconds > 1)
+                    {
+                        <span>(Edited on @post.UpdatedAt.ToString("dd/MM/yyyy HH:mm"))</span>
+                    }
+                </p>
+
+                <p>@post.Content</p>
 
                 <div class="mt-4">
                     <h5>Comments</h5>
-                    @foreach (var comment in _context.Comments.Where(c => c.Blogpost_Id == post.Id).Include(c => c.User))
+
+                    @foreach (var comment in post.Comments)
                     {
                         <div class="card mb-2">
                             <div class="card-body">
-                                <p class="mb-1">@comment.Content</p>
-                                <small class="text-muted">By @comment.User.Username on @comment.CreatedAt.ToShortDateString()</small>
+                                <div class="d-flex justify-content-between align-items-start bg-dark p-2 rounded">
+                                    <div>
+
+                                        <p class="mb-1">@comment.Content</p>
+
+                                        <small class="text-muted">
+                                            By @comment.User.Username on @comment.CreatedAt.ToShortDateString()
+                                            @if ((comment.UpdatedAt - comment.CreatedAt).TotalSeconds > 1)
+                                            {
+                                                <span>(Edited on @comment.UpdatedAt.ToString("dd/MM/yyyy HH:mm"))</span>
+                                            }
+                                        </small>
+
+                                    </div>
+
+                                    @if (comment.User_Id == currentUserId)
+                                    {
+                                        <div class="border rounded px-2 py-1">
+
+                                            <a asp-action="EditComment" asp-route-id="@comment.Id" class="text-muted text-decoration-none">Edit</a>
+                                            <span class="mx-1">|</span>
+                                            <a asp-action="DeleteComment" asp-route-id="@comment.Id" class="text-muted text-decoration-none">Delete</a>
+                                        
+                                        </div>
+                                    }
+
+                                </div>
                             </div>
                         </div>
                     }
+
+                    <form asp-controller="Blog" asp-action="AddComment" method="post" class="mt-3">
+
+                        <input type="hidden" name="blogpostId" value="@post.Id" />
+                        <div class="mb-3">
+                            <textarea name="content" class="form-control" rows="2" placeholder="Write a comment..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Comment</button>
+                    
+                    </form>
                 </div>
             </div>
         </div>
